@@ -1,0 +1,131 @@
+INTRODUCTION TO THE TIDYVERSE
+
+```{r}
+library("gapminder")
+library("dplyr")
+
+gapminder
+```
+
+FILTERING FOR ONE YEAR
+```{r}
+
+gapminder %>%
+  filter(year == 1957)
+
+```
+
+FILTERING FOR ONE COUNTRY AND ONE YEAR
+```{r}
+gapminder %>%
+  filter(year == 1957, country == "China")
+```
+
+ARRANGING OBSERVARTIONS BY LIFE EXPECTANCY
+```{r}
+
+gapminder %>%
+  arrange(lifeExp)
+
+# Sort in descending order of lifeExp
+
+gapminder %>%
+  arrange(desc(lifeExp))
+```
+FILTERING AND ARRANGING
+```{r}
+
+gapminder %>%
+  filter(year == 1957) %>%
+  arrange(desc(pop))
+
+```
+
+USING MUTATE TO CHANGE OR CREATE A COLUMN
+
+```{r}
+#Use mutate to change lifeExp to be in months
+
+gapminder %>%
+  mutate(lifeExp = 12*lifeExp)
+
+#Use mutate to create a new variable lifeExpMonths
+gapminder %>%
+  mutate(lifeExpMonths = 12*lifeExp)
+```
+
+COMBINING
+
+```{r}
+gapminder %>%
+  filter(year == 2007) %>%
+  mutate(lifeExpMOnths = 12*lifeExp) %>%
+  arrange(desc(lifeExpMOnths))
+
+```
+
+VISUALIZING WITH ggplot2
+```{r}
+
+library(ggplot2)
+
+gapminder_1952 <- gapminder %>%
+  filter(year == 1952)
+
+ggplot(gapminder_1952, aes(x = pop, y = gdpPercap)) + 
+  geom_point()
+
+```
+```{r}
+ggplot(gapminder_1952, aes(x = pop, y = lifeExp)) + 
+  geom_point()
+```
+PUTTING THE x-Axis ON A LOG SCALE
+```{r}
+ggplot(gapminder_1952, aes(x = pop, y = lifeExp)) +
+  geom_point() +
+  scale_x_log10()
+```
+
+PUTTING THE x-and and y-axes on a log scale
+```{r}
+ggplot(gapminder_1952, aes(x=pop, y=gdpPercap)) +
+  geom_point() +
+  scale_x_log10() + 
+  scale_y_log10()
+
+```
+ADDING COLOR TO A SCATTER PLOT
+
+```{r}
+ggplot(gapminder_1952, aes(x=pop, y=lifeExp, color = continent)) +
+  geom_point() +
+  scale_x_log10()
+```
+
+ADDING SIZE AND COLOR TO A PLOT
+```{r}
+ggplot(gapminder_1952, aes(x=pop, y=lifeExp, color = continent, size = gdpPercap)) +
+  geom_point() +
+  scale_x_log10()
+```
+FACETING
+Creating a subgraph for each continent
+
+```{r}
+ggplot(gapminder_1952, aes(x=pop, y=lifeExp)) +
+  geom_point() +
+  scale_x_log10() +
+  facet_wrap(~ continent)
+
+```
+FACETING BY YEAR
+```{r}
+ggplot(gapminder, aes(x=gdpPercap, y=lifeExp, color = continent, size = pop)) +
+  geom_point() +
+  scale_x_log10() +
+  facet_wrap(~ year)
+```
+
+
+
