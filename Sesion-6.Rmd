@@ -92,3 +92,228 @@ ggplot(oceania_1952, aes(x=country, y = gdpPercap))+
 
 ```
 
+HISTOGRAM
+
+VISUALIZING POPULATION
+
+```{r}
+library(gapminder)
+library(ggplot2)
+library(dplyr)
+
+gapminder_1952 <- gapminder %>%
+  filter(year == 1952) %>%
+  mutate(pop_by_mil = pop/1000000)
+
+ggplot(gapminder_1952, aes(x=pop_by_mil)) +
+  geom_histogram(bins = 50)
+
+```
+
+VISUALIZING POPULATIN WITH x = axis on a log scale
+
+```{r}
+gapminder_1952 <- gapminder %>%
+  filter(year == 1952)
+
+ggplot(gapminder_1952, aes(x=pop)) +
+  geom_histogram(bins = 50) +
+  scale_x_log10()
+         
+         
+```
+
+BOXPLOTS
+
+Comparing GDP per capita across continents
+
+```{r}
+gapminder_1952 <- gapminder %>%
+  filter(year == 1952)
+
+ggplot(gapminder_1952, aes(x=continent, y=gdpPercap)) +
+  geom_boxplot() + 
+  scale_y_log10()
+
+```
+
+ADDING A TITLE TO YOUR GRAPH
+```{r}
+gapminder_1952 <- gapminder %>%
+  filter(year == 1952)
+
+ggplot(gapminder_1952, aes(x=continent, y=gdpPercap)) +
+  geom_boxplot() + 
+  scale_y_log10() +
+  ggtitle("Comparing GDP Per capita across continents")
+```
+
+
+DATA MANIPULATION WITH DPLYR
+```{r}
+
+library(tidyverse)
+counties <- read.csv('counties.csv')
+glimpse(counties)
+
+
+```
+
+```{r}
+counties %>%
+  select(state, county, population, men, women)
+
+counties_selected <- counties %>%
+  select(state, county, population, private_work, public_work, self_employed)
+
+counties_selected %>%
+  arrange(desc(public_work))
+
+counties_selected <- counties %>%
+  select(state, county, population) 
+
+counties_selected %>%
+  filter(population > 1000000) 
+
+
+counties_selected <- counties %>%
+  select(state, county, population, private_work, public_work, self_employed)
+
+counties_selected %>%
+  filter(state == "Texas", population > 1000000) %>%
+  arrange(desc(private_work))
+```
+
+
+```{r}
+counties %>%
+  select(state, county, population, men, women) %>%
+  mutate(proportion_men = men/population) %>%
+  filter(population > 10000) %>%
+  arrange(desc(proportion_men))
+```
+
+THE VERB COUNT
+
+```{r}
+
+selected_counties <- counties %>%
+  select(state, county, population, citizens)
+
+counties_selected <- counties %>%
+  count(region, sort = TRUE) %>%
+  arrange(desc(n))
+
+```
+
+COUNTING CITIZIENS BY STATE
+
+```{r}
+counties_selected <- counties %>%
+  select(county, region, state, population, citizens)
+
+
+counties_selected %>%
+  count(state, wt = citizens) %>% #agrupa por estado, pero el conteo es por los valores de citiziens
+  arrange(desc(n))
+```
+
+MUTATING AND COUNTING
+
+```{r}
+counties_selected <- counties %>%
+  select(county, region, state, population, walk)
+
+counties_selected %>%
+  mutate(population_walk = population*walk/100) %>%
+  count(state, wt = population_walk, sort = TRUE)
+```
+
+SUMMARIZING
+
+```{r}
+
+counties_selected <- counties %>%
+  select(county, population, income, unemployment)
+
+counties_selected %>%
+  summarise(min_population = min(population), max_unemployment = max(unemployment), averange_income = mean(income))
+
+```
+
+SUMMARIZING BY STATE
+
+```{r}
+counties_selected <- counties %>%
+  select(state, county, population, land_area)
+
+counties_selected %>%
+  group_by(state) %>%
+  summarise(total_area = sum(land_area), total_population = sum(population)) %>%
+  mutate(density = total_population/total_area) %>%
+  arrange(desc(density)) 
+
+counties_selected <- counties %>%
+  select(state, region, county, population)
+
+counties_selected %>%
+  group_by(region, state) %>%
+  summarise(total_population = sum(population)) %>%
+  summarise(average_pop = mean(total_population), median_pop = median(total_population))
+
+```
+
+TOP_n VERB
+
+```{r}
+
+counties_selected <- counties %>%
+  select(state, region, county, metro, population, walk)
+
+counties_selected %>%
+  group_by(region) %>%
+  top_n(1, walk) #devuelve la mayor cantidad de porcentaje de ciudadanos caminando
+
+counties_selected <- counties %>%
+  select(state, region, county, income, population)
+
+counties_selected %>%
+  group_by(region, state) %>%
+  summarise(average_income = mean(income)) %>%
+  top_n(1, average_income)
+
+```
+
+```{r}
+
+counties_selected <- counties %>%
+  select(state, metro, population)
+
+
+counties_selected %>%
+  group_by(state, metro) %>%
+  summarise(total_pop = sum(population)) %>%
+  top_n(1, total_pop) %>%
+  ungroup() %>% #quita la agrupación y convierte a un data set
+  count(metro)
+```
+
+SELECTING COLUMNS
+
+```{r}
+counties %>%
+  select(state, county, population, professional : production) %>%
+  arrange(desc(service))
+
+counties %>%
+  select(state, county, population, ends_with("work")) %>%
+  filter(public_work >= 50)
+
+counties %>%
+  select(state, county, population, starts_with("income"))
+
+counties %>%
+  select(state, county, population, contains("at"))
+```
+
+
